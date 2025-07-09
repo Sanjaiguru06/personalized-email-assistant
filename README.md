@@ -8,6 +8,26 @@
 
 ---
 
+## 🚀 Features
+
+✅ Detects and filters emails from your company  
+✅ Sends instant Telegram alerts with email subject + link  
+✅ Built using **n8n** — no code, fully visual  
+✅ Works without needing Flask or any local script running  
+✅ Easily customizable for other email senders or platforms
+
+---
+
+## 🛠️ Tech Stack
+
+| Tool      | Purpose                          |
+|-----------|----------------------------------|
+| **n8n**   | Workflow automation engine       |
+| **Gmail Node** | Polling inbox for new mails    |
+| **Telegram Node** | Send alert messages         |
+| **IF Node** | Filter only company emails     |
+
+
 ## 🧠 What it Does
 
 - 📥 Filters emails from your company (e.g. `@company.com`)
@@ -20,14 +40,10 @@
 
 ## 🏗️ Architecture
 
-```plaintext
-Gmail/Outlook
+Gmail (via n8n trigger)
    │
    ▼
-n8n Email Trigger
-   │ (Filter @company.com)
-   ▼
-Webhook → Flask API (LangChain Summary + Intent)
+Filter Node (@company.com check)
    │
-   ├── Desktop Notification (Python)
-   └── Telegram Bot Notification
+   ▼
+Telegram Node (Send notification)
