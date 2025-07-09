@@ -1,0 +1,148 @@
+{
+  "name": "Company Email Filter",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -120,
+        40
+      ],
+      "id": "7bd3dde8-e1ab-4921-ab7e-481a576fe773",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "a2INxXofiaivjlzl",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "155003d3-f29a-4b79-9740-e6eb672ad5f1",
+              "leftValue": "={{$json[\"From\"]}}",
+              "rightValue": "@gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        200,
+        40
+      ],
+      "id": "1a57650f-9b0f-40db-8ed6-05e2e7110879",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "function escapeMarkdownV2(text) {\n  return text\n    .replace(/\\\\/g, '\\\\\\\\')\n    .replace(/\\*/g, '\\\\*')\n    .replace(/_/g, '\\\\_')\n    .replace(/\\[/g, '\\\\[')\n    .replace(/\\]/g, '\\\\]')\n    .replace(/\\(/g, '\\\\(')\n    .replace(/\\)/g, '\\\\)')\n    .replace(/~/g, '\\\\~')\n    .replace(/`/g, '\\\\`')\n    .replace(/>/g, '\\\\>')\n    .replace(/#/g, '\\\\#')\n    .replace(/\\+/g, '\\\\+')\n    .replace(/-/g, '\\\\-')\n    .replace(/=/g, '\\\\=')\n    .replace(/\\|/g, '\\\\|')\n    .replace(/{/g, '\\\\{')\n    .replace(/}/g, '\\\\}')\n    .replace(/\\./g, '\\\\.')\n    .replace(/!/g, '\\\\!')\n    .replace(/@/g, '\\\\@')\n    .replace(/</g, '\\\\<');\n}\n\nreturn {\n  json: {\n    escapedFrom: escapeMarkdownV2($json[\"From\"] || \"Unknown\"),\n    escapedSubject: escapeMarkdownV2($json[\"Subject\"] || \"No Subject\"),\n    messageId: $json[\"id\"] || \"\"\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        20
+      ],
+      "id": "715e7187-398a-4b24-a227-e4d80c8873db",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "chatId": "5724123719",
+        "text": "=📬 *New Email Alert\\!*\n👤 *From:* {{$json[\"escapedFrom\"]}}\n✉️ *Subject:* {{$json[\"escapedSubject\"]}}\n\n📥 [Click to view in Gmail](https://mail.google.com/mail/u/0/#inbox/{{$json[\"messageId\"]}})\n",
+        "additionalFields": {
+          "parse_mode": "MarkdownV2"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        700,
+        20
+      ],
+      "id": "b3f30fab-5fb8-4a4b-81ab-e488eca6cba2",
+      "name": "Send a text message",
+      "webhookId": "f9b6fe90-3dfe-46f6-afe1-0a5fede49312",
+      "credentials": {
+        "telegramApi": {
+          "id": "hRO2PeTpZdcrBtR9",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b03a0723-a9a9-432a-ad73-659aad6fd599",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9e7668d97599f0073d7a0a7edff6e7e74cf94d92bc1fcc52c27589d7c3779ec0"
+  },
+  "id": "dBSHqoE91FHY3IlY",
+  "tags": []
+}
